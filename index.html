@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Azythos Motion v8.1 · Ultimate Biomechanics + Gold Standard</title>
+    <title>Azythos Motion v8.2 · Ultimate Biomechanics + Gold Standard</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
@@ -345,32 +345,63 @@
         }
         .countdown-overlay.show { opacity: 1; }
 
-        .postprocess-overlay {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(18px);
-            border: 1px solid var(--accent-amber); border-radius: var(--radius-md);
-            padding: 24px 32px; z-index: 25; text-align: center;
-            display: none; box-shadow: 0 0 60px rgba(251, 191, 36, 0.3);
+        /* 🔥 v8.2: Non-blocking post-process badge */
+        .postprocess-badge {
+            position: absolute; bottom: 24px; right: 24px;
+            background: rgba(2, 6, 23, 0.92); backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid var(--accent-amber);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px; z-index: 25;
+            display: none; min-width: 220px; max-width: 300px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            pointer-events: auto;
         }
-        .postprocess-overlay.visible { display: block; }
-        .postprocess-overlay .pp-icon {
-            font-size: 32px; margin-bottom: 10px; display: block;
+        .postprocess-badge.visible {
+            display: block;
+            animation: slide-up 0.35s var(--transition-smooth);
+        }
+        .postprocess-badge .ppb-header {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 11px; font-weight: 800; letter-spacing: 0.5px;
+            color: var(--accent-amber); margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        .postprocess-badge .ppb-header .ppb-icon {
+            font-size: 14px;
             animation: pulse-dot 1.2s ease-in-out infinite;
         }
-        .postprocess-overlay .pp-title {
-            font-size: 14px; font-weight: 700; color: var(--accent-amber);
-            margin-bottom: 6px; letter-spacing: 0.5px;
+        .postprocess-badge .ppb-queue {
+            font-size: 10px; color: var(--text-dim);
+            margin-bottom: 6px; font-family: var(--font-mono);
+            min-height: 12px;
         }
-        .postprocess-overlay .pp-sub {
-            font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;
+        .postprocess-badge .ppb-sub {
+            font-size: 11px; color: var(--text-secondary);
+            margin-bottom: 8px; line-height: 1.4;
+            font-family: var(--font-mono);
         }
-        .postprocess-overlay .pp-bar {
-            width: 240px; height: 6px; background: rgba(255,255,255,0.1);
-            border-radius: 3px; overflow: hidden; margin: 0 auto;
+        .postprocess-badge .ppb-bar {
+            width: 100%; height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px; overflow: hidden;
         }
-        .postprocess-overlay .pp-fill {
-            height: 100%; background: linear-gradient(90deg, var(--accent-amber), var(--accent-emerald));
+        .postprocess-badge .ppb-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-amber), var(--accent-emerald));
             width: 0%; transition: width 0.3s ease;
+        }
+        body.dev-phone .postprocess-badge {
+            bottom: 10px; right: 10px;
+            min-width: 160px; max-width: 200px;
+            padding: 8px 10px;
+        }
+        body.dev-phone .postprocess-badge .ppb-header { font-size: 10px; }
+        body.dev-phone .postprocess-badge .ppb-sub { font-size: 10px; }
+
+        /* Telemetry panel ile çakışmasın diye badge yukarı kayar */
+        body.dev-phone .postprocess-badge.visible ~ .telemetry-panel.visible {
+            bottom: 130px;
         }
 
         .history-panel {
@@ -896,7 +927,6 @@
                         <option value="2">Yüksek</option>
                     </select>
                 </div>
-                <!-- 🏆 v8.1: ALTIN STANDART TOGGLE -->
                 <div class="control-row" style="margin-top:10px; padding-top:10px; border-top:1px dashed rgba(251,191,36,0.2);">
                     <label style="display:flex; align-items:center; gap:8px; font-weight:700; text-transform:none; color:var(--accent-amber); font-size:12px; cursor:pointer;">
                         <input type="checkbox" id="goldStandardToggle" checked onchange="updateGoldStandard()">
@@ -914,7 +944,7 @@
 
             <div class="card" data-mode="jump" style="border-color:var(--accent-amber);">
                 <div class="card-title"><span class="icon">⬆</span> Dikey Sıçrama <span class="badge" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0a0e1a;">🏆 ALTIN STANDART</span></div>
-                <div class="card-desc">Uçuş süresi + Sayers gücü + trokanter (core) + 120fps video işleme.</div>
+                <div class="card-desc">Uçuş süresi + Sayers gücü + trokanter (core) + 120fps video işleme. <strong style="color:var(--accent-emerald);">Arka planda işlenir, beklemek yok!</strong></div>
                 <div class="control-row"><label>Tekrar</label><input type="number" id="jumpReps" value="3" min="1" max="12"></div>
                 <div class="control-row" style="margin-top:6px;">
                     <label>Vücut Ağırlığı (kg)</label>
@@ -1078,11 +1108,15 @@
 
             <div class="countdown-overlay" id="countdownOverlay" aria-hidden="true"></div>
 
-            <div class="postprocess-overlay" id="postProcessOverlay">
-                <span class="pp-icon">🔬</span>
-                <div class="pp-title">ALTIN STANDART ANALİZ</div>
-                <div class="pp-sub" id="ppSub">Video işleniyor... 120 fps</div>
-                <div class="pp-bar"><div class="pp-fill" id="ppFill"></div></div>
+            <!-- 🔥 v8.2: Non-blocking post-process badge -->
+            <div class="postprocess-badge" id="postProcessBadge">
+                <div class="ppb-header">
+                    <span class="ppb-icon">🔬</span>
+                    <span>ALTIN STANDART ANALİZ</span>
+                </div>
+                <div class="ppb-queue" id="ppQueueStatus"></div>
+                <div class="ppb-sub" id="ppSub">Video işleniyor...</div>
+                <div class="ppb-bar"><div class="ppb-fill" id="ppFill"></div></div>
             </div>
 
             <div class="hud-overlay">
@@ -1092,6 +1126,11 @@
                         <span class="dot rec" aria-hidden="true"></span>
                         <span style="color:var(--accent-rose);font-weight:700;">KAYIT</span>
                         <span id="recTimer" style="font-family:var(--font-mono);">00:00</span>
+                    </div>
+                    <div class="hud-badge" id="queueHudBadge" style="display:none;border-color:var(--accent-amber);">
+                        <span class="dot" style="background:var(--accent-amber);"></span>
+                        <span style="color:var(--accent-amber);font-weight:700;">KUYRUK</span>
+                        <span id="queueHudCount" style="font-family:var(--font-mono);">0</span>
                     </div>
                 </div>
             </div>
@@ -1201,11 +1240,12 @@
             currentAthlete: null,
             currentSessionId: null,
             sessionBuffer: [],
-            // 🔥 v8.1: Altın standart toggle + gerçek kamera fps
+            // 🔥 v8.2: Altın standart + non-blocking kuyruk
             goldStandardEnabled: true,
             actualCameraFps: 0,
             postProcessQueue: [],
             postProcessing: false,
+            activePostProcess: null,
             brain: {
                 jump: {}, squat: {}, pushup: {}, lunge: {}, deadlift: {}, plank: {}, power: {}, free: {},
                 load: {
@@ -1285,7 +1325,7 @@
             STATE.goldStandardEnabled = document.getElementById('goldStandardToggle').checked;
             try { localStorage.setItem('azythos_gold_standard', STATE.goldStandardEnabled ? '1' : '0'); } catch (_) {}
             showToast(STATE.goldStandardEnabled
-                ? '🏆 Altın standart analiz aktif — video işlenecek'
+                ? '🏆 Altın standart analiz aktif — arka planda işlenecek'
                 : '⚡ Hızlı mod — sadece canlı tahmin kullanılacak',
                 STATE.goldStandardEnabled ? 'success' : 'info', 2500);
             STATE.log(`🏆 Altın standart: ${STATE.goldStandardEnabled ? 'AKTİF' : 'KAPALI'}`, 'info');
@@ -1791,7 +1831,6 @@
             document.getElementById('hudDot').className = 'dot';
             document.getElementById('hudStatus').textContent = 'Hazır';
             updateCamLabel();
-            // 🔥 v8.1: Gerçek kamera fps'ini kontrol et
             await checkActualCameraFps();
             speak('Azythos Motion Ultimate hazır.');
         }
@@ -1821,8 +1860,7 @@
                 if (actualFps && actualFps < 60) {
                     showToast(
                         `⚠️ Kamera ${actualFps}fps veriyor (120fps hedefleniyor).\n` +
-                        `Altın standart analiz bu fps'te çalışır ama hassasiyet düşer.\n` +
-                        `💡 Daha iyi aydınlatma veya daha yeni cihaz önerilir.`,
+                        `Altın standart analiz bu fps'te çalışır ama hassasiyet düşer.`,
                         'warning', 7000
                     );
                     STATE.log(`⚠️ Kamera fps düşük: ${actualFps} (ideal 120)`, 'warning');
@@ -2059,7 +2097,7 @@
                         <div class="t-row"><span class="t-label">⚖️ W/kg</span><span class="t-value">${powerPerKg}</span></div>
                         <div class="t-row"><span class="t-label">💨 Uçuş</span><span class="t-value">${flightTimeSec.toFixed(3)} s</span></div>
                         <div style="margin-top:8px;padding-top:6px;border-top:1px dashed rgba(255,255,255,0.1);font-size:10px;color:var(--text-dim);">
-                            ${STATE.goldStandardEnabled ? '🔬 120fps video işleme kuyruğa alınacak' : '⚡ Hızlı mod (post-process kapalı)'}
+                            ${STATE.goldStandardEnabled ? '🔬 120fps video işleme kuyruğa alınacak (bekleme yok)' : '⚡ Hızlı mod (post-process kapalı)'}
                         </div>
                     `;
 
@@ -2810,7 +2848,6 @@
                     const sec = String(s % 60).padStart(2, '0');
                     document.getElementById('recTimer').textContent = `${m}:${sec}`;
                 }, 200);
-                // 🔥 v8.1: fps bilgisi
                 const camFps = STATE.actualCameraFps || 30;
                 STATE.log(`🔴 Kayıt başladı (hedef 120fps, kamera ${camFps}fps)`, 'info');
             } catch (e) {
@@ -2888,7 +2925,6 @@
                     position: STATE.athletes[STATE.currentAthlete]?.profile?.position || '',
                 } : null,
                 refined: null,
-                // 🔥 v8.1: Altın standart durumu kayda yazılır
                 goldStandardUsed: STATE.currentMode === 'jump' ? STATE.goldStandardEnabled : null,
                 cameraFpsAtCapture: STATE.actualCameraFps || null,
             };
@@ -2924,26 +2960,22 @@
                 goldStandardUsed: data.goldStandardUsed,
                 date: Date.now(),
             };
-            addTestToSession(sessionRecord);
+            const added = addTestToSession(sessionRecord);
 
-            if (STATE.currentAthlete && STATE.athletes[STATE.currentAthlete]) {
+            if (added && STATE.currentAthlete && STATE.athletes[STATE.currentAthlete]) {
                 const aName = STATE.athletes[STATE.currentAthlete].name;
                 showToast(`✅ ${sessionRecord.type} → ${aName} kaydına eklendi`, 'success', 3000);
-            } else {
+            } else if (!added) {
                 showToast(`💾 ${sessionRecord.type} kaydedildi (sporcu seçili değil)`, 'info', 3000);
             }
 
-            // 🔥 v8.1: Koşullu post-process
+            // 🔥 v8.2: Koşullu post-process — KUYRUĞA EKLE (non-blocking)
             if (STATE.currentMode === 'jump' && blob && blob.size > 0) {
                 if (STATE.goldStandardEnabled) {
-                    STATE.log('🔬 Altın standart video işleme kuyruğa alındı', 'info');
-                    setTimeout(() => {
-                        postProcessJumpVideo(blob, recordId).catch(e => {
-                            STATE.log('Video işleme hatası: ' + e.message, 'error');
-                        });
-                    }, 800);
+                    STATE.log('🔬 Altın standart video kuyruğa ekleniyor', 'info');
+                    enqueuePostProcess(blob, recordId);
                 } else {
-                    STATE.log('⚡ Hızlı mod: post-process atlandı (canlı tahmin kullanılıyor)', 'info');
+                    STATE.log('⚡ Hızlı mod: post-process atlandı', 'info');
                     showToast('⚡ Hızlı mod: canlı tahmin kullanıldı\n🏆 Altın standart için ayarlardan açın', 'info', 4000);
                 }
             }
@@ -2952,10 +2984,6 @@
         // ============================================================
         // 🔥 v8.1: AKILLI BASELINE TESPİTİ
         // ============================================================
-        /**
-         * HipY geçmişinde en düşük varyansa sahip pencereyi bulur.
-         * Sporcu ilk karelerde hareket etse bile doğru baseline yakalar.
-         */
         function findStableBaseline(hipYHistory, fps) {
             const windowSize = Math.max(8, Math.round(fps * 0.5));
             const searchLimit = Math.min(hipYHistory.length - windowSize, Math.round(fps * 3));
@@ -2982,19 +3010,102 @@
         }
 
         // ============================================================
-        // 🏆 ALTIN STANDART: VİDEO İŞLEME (120fps)
+        // 🏆 v8.2: POST-PROCESS KUYRUK YÖNETİCİSİ
         // ============================================================
-        async function postProcessJumpVideo(videoBlob, recordId) {
-            const overlay = document.getElementById('postProcessOverlay');
+
+        /**
+         * Yeni post-process işi kuyruğa ekler.
+         * Aynı anda sadece 1 iş çalışır — yenisi bitince sıradakini başlatır.
+         */
+        function enqueuePostProcess(videoBlob, recordId) {
+            STATE.postProcessQueue.push({ blob: videoBlob, recordId, enqueuedAt: Date.now() });
+            STATE.log(`📥 Post-process kuyruğa eklendi (${STATE.postProcessQueue.length} bekliyor)`, 'info');
+            showToast(`🔬 Video kuyruğa alındı (${STATE.postProcessQueue.length} bekliyor)\nDiğer testleri yapmaya devam edebilirsiniz`, 'info', 3500);
+            updateQueueBadge();
+            processNextInQueue();
+        }
+
+        /**
+         * Kuyruktaki sıradaki işi başlatır. Zaten çalışıyorsa bekler.
+         */
+        async function processNextInQueue() {
+            if (STATE.postProcessing) return;
+            if (STATE.postProcessQueue.length === 0) {
+                hidePostProcessBadge();
+                return;
+            }
+            STATE.postProcessing = true;
+            const job = STATE.postProcessQueue.shift();
+            STATE.activePostProcess = job;
+            updateQueueBadge();
+            showPostProcessBadge();
+            try {
+                await runPostProcessJob(job.blob, job.recordId);
+            } catch (e) {
+                STATE.log('Kuyruk işi hatası: ' + e.message, 'error');
+            } finally {
+                STATE.postProcessing = false;
+                STATE.activePostProcess = null;
+                updateQueueBadge();
+                if (STATE.postProcessQueue.length > 0) {
+                    setTimeout(() => processNextInQueue(), 400);
+                } else {
+                    hidePostProcessBadge();
+                    STATE.log('✅ Post-process kuyruğu tamamlandı', 'success');
+                }
+            }
+        }
+
+        function showPostProcessBadge() {
+            const el = document.getElementById('postProcessBadge');
+            if (el) el.classList.add('visible');
+        }
+
+        function hidePostProcessBadge() {
+            const el = document.getElementById('postProcessBadge');
+            if (el) {
+                el.classList.remove('visible');
+                const fill = document.getElementById('ppFill');
+                if (fill) fill.style.width = '0%';
+            }
+        }
+
+        function updateQueueBadge() {
+            const qEl = document.getElementById('ppQueueStatus');
+            if (qEl) {
+                const remaining = STATE.postProcessQueue.length;
+                const current = STATE.activePostProcess ? 1 : 0;
+                if (remaining > 0) {
+                    qEl.textContent = `📋 Sırada: ${remaining} video bekliyor`;
+                } else if (current) {
+                    qEl.textContent = `⚙️ İşleniyor...`;
+                } else {
+                    qEl.textContent = '';
+                }
+            }
+            const hudBadge = document.getElementById('queueHudBadge');
+            const hudCount = document.getElementById('queueHudCount');
+            if (hudBadge && hudCount) {
+                const total = STATE.postProcessQueue.length + (STATE.activePostProcess ? 1 : 0);
+                if (total > 0) {
+                    hudBadge.style.display = 'flex';
+                    hudCount.textContent = total;
+                } else {
+                    hudBadge.style.display = 'none';
+                }
+            }
+        }
+
+        // ============================================================
+        // 🏆 ALTIN STANDART: TEK İŞ
+        // ============================================================
+        async function runPostProcessJob(videoBlob, recordId) {
             const ppSub = document.getElementById('ppSub');
             const ppFill = document.getElementById('ppFill');
-            overlay.classList.add('visible');
-            ppFill.style.width = '0%';
-            ppSub.textContent = 'Video yükleniyor...';
+            if (ppFill) ppFill.style.width = '0%';
+            if (ppSub) ppSub.textContent = 'Video yükleniyor...';
 
-            STATE.postProcessing = true;
             STATE.log('🔬 Altın standart video işleme başladı', 'info');
-            showToast('🔬 Altın standart analiz başladı\n120fps kare kare işlenecek', 'info', 6000);
 
             try {
                 const url = URL.createObjectURL(videoBlob);
@@ -3015,7 +3126,7 @@
                 const totalDuration = tempVideo.duration;
                 const totalFrames = Math.round(totalDuration * useFps);
 
-                ppSub.textContent = `Video: ${useFps}fps · ${totalFrames} kare`;
+                if (ppSub) ppSub.textContent = `${useFps}fps · ${totalFrames} kare`;
 
                 const hipYHistory = [];
                 const hipVisibilityHistory = [];
@@ -3043,9 +3154,7 @@
 
                 for (let f = 0; f < totalFrames; f++) {
                     tempVideo.currentTime = f * frameDuration;
-                    await new Promise(r => {
-                        tempVideo.onseeked = r;
-                    });
+                    await new Promise(r => { tempVideo.onseeked = r; });
 
                     offCtx.drawImage(tempVideo, 0, 0, offCanvas.width, offCanvas.height);
 
@@ -3073,15 +3182,14 @@
                     hipVisibilityHistory.push(hipVis);
 
                     const progressPct = Math.round(((f + 1) / totalFrames) * 100);
-                    ppFill.style.width = progressPct + '%';
-                    if (f % 5 === 0) {
-                        ppSub.textContent = `İşleniyor... ${progressPct}% (${f + 1}/${totalFrames})`;
+                    if (ppFill) ppFill.style.width = progressPct + '%';
+                    if (f % 5 === 0 && ppSub) {
+                        ppSub.textContent = `${progressPct}% (${f + 1}/${totalFrames})`;
                     }
                 }
 
                 try { ppPose.close(); } catch (_) {}
 
-                // 🔥 v8.1: AKILLI BASELINE
                 const baseY = findStableBaseline(hipYHistory, useFps);
                 if (baseY === null) {
                     throw new Error('Baseline tespit edilemedi (ilk saniyede hareket var?)');
@@ -3127,14 +3235,10 @@
                     : 0;
 
                 const refinedResult = {
-                    jumpHeightCm,
-                    trochanterCm,
-                    sayersPowerW,
-                    powerPerKg,
+                    jumpHeightCm, trochanterCm, sayersPowerW, powerPerKg,
                     chainEfficiency,
                     flightTimeSec: +flightTimeSec.toFixed(3),
-                    flightFrames,
-                    fps: useFps,
+                    flightFrames, fps: useFps,
                     bodyWeightKg: bodyWeight,
                     interpretation: interpretChain(chainEfficiency),
                     refined: true,
@@ -3145,14 +3249,11 @@
 
                 const interp = refinedResult.interpretation;
                 showToast(
-                    `🏆 ALTIN STANDART ANALİZ\n` +
-                    `📏 Sıçrama: ${jumpHeightCm} cm\n` +
-                    `🔗 Kinetik Zincir: ${trochanterCm} cm (%${chainEfficiency})\n` +
-                    `⚡ Zirve Güç: ${sayersPowerW} W\n` +
+                    `🏆 Altın standart hazır!\n` +
+                    `📏 ${jumpHeightCm}cm · ⚡ ${sayersPowerW}W · 🔗 %${chainEfficiency}\n` +
                     `${interp.label}`,
-                    'success', 8000
+                    'success', 6000
                 );
-
                 STATE.log(`🏆 Altın standart: ${jumpHeightCm}cm · ${trochanterCm}cm (%${chainEfficiency}) · ${sayersPowerW}W`, 'success');
 
                 URL.revokeObjectURL(url);
@@ -3162,12 +3263,6 @@
                 STATE.log('⚠️ Video işleme hatası: ' + err.message, 'error');
                 showToast('⚠️ Video işleme başarısız: ' + err.message, 'warning', 5000);
                 return null;
-            } finally {
-                STATE.postProcessing = false;
-                setTimeout(() => {
-                    overlay.classList.remove('visible');
-                    ppFill.style.width = '0%';
-                }, 1500);
             }
         }
 
@@ -3176,6 +3271,13 @@
                 return new Promise((resolve) => {
                     let frames = 0;
                     const startTime = performance.now();
+                    let resolved = false;
+                    const safeResolve = (val) => {
+                        if (resolved) return;
+                        resolved = true;
+                        try { videoEl.pause(); } catch (_) {}
+                        resolve(val);
+                    };
                     const countFrame = (_, meta) => {
                         frames++;
                         if (frames < 30) {
@@ -3183,16 +3285,15 @@
                         } else {
                             const elapsed = (performance.now() - startTime) / 1000;
                             const fps = frames / elapsed;
-                            videoEl.pause();
                             videoEl.currentTime = 0;
-                            resolve(Math.round(fps));
+                            safeResolve(Math.round(fps));
                         }
                     };
                     videoEl.currentTime = 0;
                     videoEl.play().then(() => {
                         videoEl.requestVideoFrameCallback(countFrame);
-                    }).catch(() => resolve(60));
-                    setTimeout(() => resolve(60), 2500);
+                    }).catch(() => safeResolve(60));
+                    setTimeout(() => safeResolve(60), 2500);
                 });
             }
             return 60;
@@ -3626,12 +3727,22 @@
             if (!a) return;
             STATE.currentAthlete = id;
             document.getElementById('athleteDetailTitle').innerHTML =
-                `👤 <span>${a.name}</span> <small style="font-size:12px;color:var(--text-dim);font-weight:400;">· ${a.sessions.length} oturum</small>`;
+                `👤 <span>${escapeHtml(a.name)}</span> <small style="font-size:12px;color:var(--text-dim);font-weight:400;">· ${a.sessions.length} oturum</small>`;
             renderProfileCard();
             renderSessions();
             closeAthletes();
             document.getElementById('athleteDetailPanel').classList.add('open');
             updateCalibrationBadge();
+        }
+
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
         function renderProfileCard() {
@@ -3645,14 +3756,14 @@
                 <div class="profile-card">
                     <div class="pc-header">
                         <div>
-                            <div class="pc-name">${a.name}${a.id === STATE.currentAthlete ? '<span class="pc-badge">AKTİF</span>' : ''}</div>
+                            <div class="pc-name">${escapeHtml(a.name)}${a.id === STATE.currentAthlete ? '<span class="pc-badge">AKTİF</span>' : ''}</div>
                             <div class="pc-meta">
                                 ${p.height ? `<span>📏 ${p.height} cm</span>` : ''}
                                 ${p.weight ? `<span>⚖️ ${p.weight} kg</span>` : ''}
                                 ${age ? `<span>🎂 ${age} yaş</span>` : ''}
-                                ${p.position ? `<span>⚽ ${p.position}</span>` : ''}
-                                ${p.dominantFoot ? `<span>🦶 ${p.dominantFoot}</span>` : ''}
-                                ${p.team ? `<span>🏟️ ${p.team}</span>` : ''}
+                                ${p.position ? `<span>⚽ ${escapeHtml(p.position)}</span>` : ''}
+                                ${p.dominantFoot ? `<span>🦶 ${escapeHtml(p.dominantFoot)}</span>` : ''}
+                                ${p.team ? `<span>🏟️ ${escapeHtml(p.team)}</span>` : ''}
                             </div>
                         </div>
                         <button class="pc-edit-btn" onclick="toggleProfileEdit()" id="pcEditBtn">✏️ Düzenle</button>
@@ -3683,10 +3794,10 @@
                                     <option value="Çift" ${p.dominantFoot === 'Çift' ? 'selected' : ''}>Çift</option>
                                 </select>
                             </label>
-                            <label>Takım<input type="text" id="pcTeam" value="${p.team || ''}" placeholder="örn: Galatasaray"></label>
+                            <label>Takım<input type="text" id="pcTeam" value="${escapeHtml(p.team || '')}" placeholder="örn: Galatasaray"></label>
                         </div>
                         <div class="pc-form-row">
-                            <label style="grid-column: 1 / -1;">Notlar<textarea id="pcNotes" rows="2" style="background:rgba(0,0,0,0.35);border:1.5px solid var(--border-subtle);color:var(--text-primary);padding:8px 10px;border-radius:8px;font-family:var(--font-display);font-size:13px;resize:vertical;outline:none;">${p.notes || ''}</textarea></label>
+                            <label style="grid-column: 1 / -1;">Notlar<textarea id="pcNotes" rows="2" style="background:rgba(0,0,0,0.35);border:1.5px solid var(--border-subtle);color:var(--text-primary);padding:8px 10px;border-radius:8px;font-family:var(--font-display);font-size:13px;resize:vertical;outline:none;">${escapeHtml(p.notes || '')}</textarea></label>
                         </div>
                         <div class="pc-form-actions">
                             <button class="btn btn-emerald" onclick="saveAthleteProfile()">💾 Kaydet</button>
@@ -3740,7 +3851,7 @@
                 const a = STATE.athletes[STATE.currentAthlete];
                 badge.textContent = a.name;
                 badge.style.background = 'rgba(16,185,129,0.2)';
-                hint.innerHTML = `👤 <strong>${a.name}</strong> aktif · Boy: ${a.profile?.height || '?'}cm · Kilo: ${a.profile?.weight || '?'}kg`;
+                hint.innerHTML = `👤 <strong>${escapeHtml(a.name)}</strong> aktif · Boy: ${a.profile?.height || '?'}cm · Kilo: ${a.profile?.weight || '?'}kg`;
             } else {
                 badge.textContent = 'Global';
                 badge.style.background = 'rgba(100,116,139,0.2)';
@@ -4653,7 +4764,6 @@
                 });
                 applyDeviceLayout(suggested);
 
-                // 🔥 v8.1: Kayıtlı altın standart ayarını yükle
                 try {
                     const savedGold = localStorage.getItem('azythos_gold_standard');
                     if (savedGold !== null) {
@@ -4664,7 +4774,7 @@
                     }
                 } catch (_) {}
 
-                STATE.log('🚀 Azythos Motion v8.1 Ultimate + Gold Standard hazır', 'success');
+                STATE.log('🚀 Azythos Motion v8.2 Ultimate + Gold Standard (Non-blocking queue) hazır', 'success');
                 document.getElementById('telMode').textContent = '—';
                 document.getElementById('telProgress').textContent = 'Beklemede';
                 updateGlobalDisplay();
@@ -4712,7 +4822,8 @@
 
                 ensureTurkishFont().catch(() => {});
 
-                console.log('◈ Azythos Motion v8.1 Ultimate + Gold Standard');
+                console.log('◈ Azythos Motion v8.2 Ultimate + Gold Standard');
+                console.log('📌 Yeni: Post-process artık arka planda, kuyruklu ve non-blocking!');
                 console.log('📌 Kısayollar: [F] Tam Ekran [H] Geçmiş [T] Tema [C] Kamera [1/2/3] Yön');
             } catch (err) {
                 console.error('Init hatası:', err);
@@ -4761,9 +4872,11 @@
         window.saveAthleteProfile = saveAthleteProfile;
         window.ensureTurkishFont = ensureTurkishFont;
         window.TURKISH_FONT = TURKISH_FONT;
-        // 🔥 v8.1
         window.updateGoldStandard = updateGoldStandard;
         window.checkActualCameraFps = checkActualCameraFps;
+        // 🔥 v8.2: Kuyruk fonksiyonları
+        window.enqueuePostProcess = enqueuePostProcess;
+        window.processNextInQueue = processNextInQueue;
     </script>
 </body>
 </html>
